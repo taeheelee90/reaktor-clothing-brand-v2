@@ -1,6 +1,7 @@
 package reaktor.clothingbrandv2.modules;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.transaction.Transactional;
 
@@ -17,6 +18,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
+import reaktor.clothingbrandv2.modules.ProductPOJO.ProductData;
 
 @Service
 @Transactional
@@ -24,8 +26,11 @@ import lombok.RequiredArgsConstructor;
 public class ProductService {
 
 	private final RestTemplateBuilder restTemplateBuilder;
-	private final ObjectMapper objectMapper; // jackson
-	//private final ModelMapper modelMapper; // config
+	private final ObjectMapper objectMapper;
+	private final ModelMapper modelMapper;
+	private final ProductRepository productRepository;
+	private final ManufacturerRepository manufacturerRepository;
+	private final ColorRepository colorRepository;
 
 	private final String api = "https://bad-api-assignment.reaktor.com/v2/products/";
 
@@ -43,17 +48,37 @@ public class ProductService {
 		// 1. Correct Json format Remove response.charAt(0) & response.charAt(-1)
 		response = response.substring(1, response.length() - 1);
 		response = "{\"products\"  : [ " + response + "]}";
-				
+
 		// 2. Return response in correct form of JSON;
 		String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(response);
 		json = json.replaceAll("\\\\", "");
-		json = json.substring(1, json.length()-1);
-		
+		json = json.substring(1, json.length() - 1);
+
 		// 3. Map JSON to Object
 		ProductPOJO pojo = objectMapper.readValue(json, ProductPOJO.class);
-		System.out.println(pojo.getProducts().size());
 
+		// 4. Save to DB
+		List<ProductData> productData = pojo.getProducts();
+		for (ProductData data : productData) {
+			Product product = modelMapper.map(data, Product.class);
 
+			Manufacturer manufacturer = new Manufacturer();
+			manufacturer.setName(data.getManufacturer());
+			product.setManufacturer(manufacturer);
+			manufacturerRepository.save(manufacturer);
+			List<Color> colors = new ArrayList<>();
+
+			for (String s : data.getColor()) {
+
+				Color c = new Color();
+				c.setName(s);
+				colors.add(c);
+
+			}
+			colorRepository.saveAll(colors);
+			productRepository.save(product);
+
+		}
 		return pojo;
 	}
 

@@ -10,13 +10,13 @@ import lombok.Data;
 @Data
 public class ProductPOJO {
 
-	private List<Products> products = new ArrayList<>();
+	private List<ProductData> products = new ArrayList<>();
 
 	@Data
-	static class Products {
+	static class ProductData {
 		
-		//@JsonProperty("id")
-		private String id;
+		@JsonProperty("id")
+		private String product_id;
 
 		private String type;
 
