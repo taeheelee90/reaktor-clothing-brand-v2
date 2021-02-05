@@ -32,7 +32,7 @@ public class Color {
 	@JsonIgnore
 	private Long id;
 	
-	//@Column(unique = true)
+	@Column(unique = true)
 	private String name;
 	
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "color")

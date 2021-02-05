@@ -64,29 +64,40 @@ public class ProductService {
 			Product product = modelMapper.map(data, Product.class);
 
 			// Save Manufacturer to DB
-			// TODO: Check unique!
-			Manufacturer manufacturer = new Manufacturer();
-			manufacturer.setName(data.getManufacturer());
-			product.setManufacturer(manufacturer);
-			manufacturerRepository.save(manufacturer);
+			Manufacturer foundManufacturer = manufacturerRepository.findByName(data.getManufacturer());
+			if (foundManufacturer != null) { // existing data
+				product.setManufacturer(foundManufacturer);
+
+			} else { // new data
+				Manufacturer manufacturer = new Manufacturer();
+				manufacturer.setName(data.getManufacturer());
+				product.setManufacturer(manufacturer);
+				manufacturerRepository.save(manufacturer);
+			}
 
 			// Save Color to DB
-			// TODO: Check unique!
 			// TODO: ProductColor saves null and values
 			for (String s : data.getColor()) {
 				ProductColor pc = new ProductColor();
-				Color c = new Color();
-				c.setName(s);
-				pc.setColor(c);
-				pc.setProduct(product);
-				product.getColor().add(pc);
-				colorRepository.save(c);
+				Color foundColor = colorRepository.findByName(s);
+				if (foundColor != null) { // existing data
+					pc.setColor(foundColor);
+					pc.setProduct(product);
+					product.getColor().add(pc);
+
+				} else { // new Data
+					Color c = new Color();
+					c.setName(s);
+					pc.setColor(c);
+					pc.setProduct(product);
+					product.getColor().add(pc);
+					colorRepository.save(c);
+				}
+
 			}
 
 			productRepository.save(product);
-
 		}
 		return pojo;
 	}
-
 }
