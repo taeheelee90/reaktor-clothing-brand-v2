@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -21,7 +22,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Getter @Setter
+@Getter
+@Setter
 @EqualsAndHashCode(of = "id")
 @Builder
 @AllArgsConstructor
@@ -31,15 +33,16 @@ public class Product {
 	@Id
 	@GeneratedValue
 	@JsonIgnore
-	private Long id;
-	
-	private String product_id;
+	private Long prodict_id;
+
+	@Column(name = "r_product_id")
+	private String id;
 
 	private String type;
 
 	private String name;
-	
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
+
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "product", orphanRemoval = true)
 	private List<ProductColor> color = new ArrayList<>();
 
 	private int price;
@@ -47,4 +50,6 @@ public class Product {
 	@OneToOne
 	@JoinColumn(name = "manufacturer_id")
 	private Manufacturer manufacturer;
+	
+	
 }

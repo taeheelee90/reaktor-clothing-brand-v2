@@ -31,6 +31,7 @@ public class ProductService {
 	private final ProductRepository productRepository;
 	private final ManufacturerRepository manufacturerRepository;
 	private final ColorRepository colorRepository;
+	private final ProductColorRepository pcRepository;
 
 	private final String api = "https://bad-api-assignment.reaktor.com/v2/products/";
 
@@ -62,20 +63,26 @@ public class ProductService {
 		for (ProductData data : productData) {
 			Product product = modelMapper.map(data, Product.class);
 
+			// Save Manufacturer to DB
+			// TODO: Check unique!
 			Manufacturer manufacturer = new Manufacturer();
 			manufacturer.setName(data.getManufacturer());
 			product.setManufacturer(manufacturer);
 			manufacturerRepository.save(manufacturer);
-			List<Color> colors = new ArrayList<>();
 
+			// Save Color to DB
+			// TODO: Check unique!
+			// TODO: ProductColor saves null and values
 			for (String s : data.getColor()) {
-
+				ProductColor pc = new ProductColor();
 				Color c = new Color();
 				c.setName(s);
-				colors.add(c);
-
+				pc.setColor(c);
+				pc.setProduct(product);
+				product.getColor().add(pc);
+				colorRepository.save(c);
 			}
-			colorRepository.saveAll(colors);
+
 			productRepository.save(product);
 
 		}

@@ -1,6 +1,7 @@
 package reaktor.clothingbrandv2.modules;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -28,12 +29,12 @@ public class ProductColor {
 	@JsonIgnore
 	private Long id;
 	
-	@ManyToOne
-	@JoinColumn(name = "productId")
+	@ManyToOne(fetch=FetchType.LAZY)
+	@JoinColumn(name = "product_id")
 	private Product product;
 	
-	@ManyToOne
-	@JoinColumn(name = "colorId")
+	@ManyToOne(fetch=FetchType.LAZY)
+	@JoinColumn(name = "color_id")
 	private Color color;
 
 }

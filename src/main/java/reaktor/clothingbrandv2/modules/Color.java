@@ -37,4 +37,6 @@ public class Color {
 	
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "color")
 	private List<ProductColor> color = new ArrayList<>();
+	
+	
 }
